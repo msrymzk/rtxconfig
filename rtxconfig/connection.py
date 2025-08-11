@@ -162,12 +162,43 @@ class RTXConnection:
             Save command output
         """
         return self.execute_command("save")
-    
+
+    def get_status_info(self) -> Dict[str, str]:
+        """Get various status information from RTX830.
+        
+        Returns:
+            Dictionary containing status information
+        """
+        status_commands = {
+            'environment': 'show environment detail',
+            'config_list': 'show config list',
+            'packet_buffer': 'show status packet-buffer',
+            'lan1': 'show status lan1',
+            'lan2': 'show status lan2',
+            'vlan': 'show status vlan',
+            'ipv4_route': 'show ip route',
+            'nat_descriptor': 'show nat descriptor address',
+            'ip_connection': 'show ip connection',
+            'ipv6_address': 'show ipv6 address',
+            'ipv6_route': 'show ipv6 route',
+            'dhcp': 'show status dhcp summary',
+        }
+
+        status_info = {}
+        for key, command in status_commands.items():
+            try:
+                output = self.execute_command(command)
+                status_info[key] = output
+            except RTXConnectionError as e:
+                status_info[key] = f"Error: {e}"
+                logger.warning(f"Failed to get {key}: {e}")
+        return status_info
+
     def __enter__(self):
         """Context manager entry."""
         self.connect()
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         """Context manager exit."""
         self.disconnect()

@@ -11,6 +11,7 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.syntax import Syntax
 from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.columns import Columns
 
 from .config import ConfigManager as ConfigFileManager, RTXConfig
 from .connection import create_connection, RTXConnectionError
@@ -335,6 +336,42 @@ def validate(ctx, config_file: Path):
         console.print(f"[yellow]⚠ Warnings:[/yellow]")
         for warning in validation['warnings']:
             console.print(f"  • {warning}")
+
+
+@main.command()
+@click.option(
+    "--format", "-f",
+    type=click.Choice(['table', 'json', 'text']),
+    default='table',
+    help="Output format"
+)
+@click.pass_context
+def status(ctx, format: str):
+    """Show RTX830 status information."""
+    config: RTXConfig = ctx.obj['config']
+
+    try:
+        with create_connection(config.rtx_connection.model_dump()) as conn:
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                console=console
+            ) as progress:
+                task = progress.add_task("Gathering status information...", total=None)
+                status_info = conn.get_status_info()
+            
+            logging.info(status_info)
+            if format == 'json':
+                import json
+                console.print(json.dumps(status_info, indent=2, ensure_ascii=False))
+            else:  # text format (default)
+                for key, value in status_info.items():
+                    console.print(f"\n[bold cyan]{key.upper()}:[/bold cyan]")
+                    console.print(value)
+
+    except RTXConnectionError as e:
+        console.print(f"[red]✗ Failed to get status: {e}[/red]")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
