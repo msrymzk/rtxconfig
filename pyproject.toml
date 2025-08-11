@@ -1,0 +1,21 @@
+[project]
+name = "rtxconfig"
+version = "0.1.0"
+description = "RTX830 configuration management tool with Git integration"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "netmiko>=4.0.0",
+    "paramiko>=3.0.0",
+    "click>=8.0.0",
+    "pydantic>=2.0.0",
+    "ruamel.yaml>=0.17.0",
+    "rich>=13.0.0"
+]
+
+[project.scripts]
+rtx = "rtxconfig.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

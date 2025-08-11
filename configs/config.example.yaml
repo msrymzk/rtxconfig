@@ -1,0 +1,14 @@
+rtx_connection:
+  host: "192.168.1.1"
+  username: "admin"
+  key_file: "~/.ssh/rtx830_rsa"
+  port: 22
+  timeout: 30
+
+backup:
+  directory: "./backups"
+  keep_days: 30
+
+logging:
+  level: "INFO"
+  file: "./logs/rtxconfig.log"
