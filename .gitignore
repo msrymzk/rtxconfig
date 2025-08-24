@@ -53,3 +53,8 @@ configs/config.yaml
 *.key
 *.pem
 .ssh/
+
+
+# logs
+*.log
+

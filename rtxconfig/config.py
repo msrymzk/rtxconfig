@@ -21,6 +21,8 @@ class RTXConnectionConfig(BaseModel):
     banner_timeout: int = Field(15, description="Banner timeout in seconds")
     auth_timeout: int = Field(15, description="Authentication timeout in seconds")
     conn_timeout: int = Field(10, description="Connection timeout in seconds")
+    secret: Optional[str] = Field(None, description="Enable password for privileged mode")
+    session_log: Optional[str] = Field(None, description="Path to session log file")
     
     @validator('key_file')
     def validate_key_file(cls, v):

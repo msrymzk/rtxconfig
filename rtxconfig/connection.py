@@ -65,6 +65,8 @@ class RTXConnection:
             'banner_timeout': self.config.get('banner_timeout', 15),
             'auth_timeout': self.config.get('auth_timeout', 15),
             'conn_timeout': self.config.get('conn_timeout', 10),
+            'secret': self.config.get('secret'),
+            'session_log': self.config.get('session_log'),
         }
         
         try:
@@ -127,7 +129,7 @@ class RTXConnection:
             raise RTXConnectionError(f"Command execution failed: {e}")
     
     def send_config_commands(self, commands: list[str]) -> str:
-        """Send configuration commands to RTX830.
+        """Send configuration commands to RTX830 using send_config_set.
         
         Args:
             commands: List of configuration commands
@@ -137,10 +139,13 @@ class RTXConnection:
         """
         if not self.is_connected():
             raise RTXConnectionError("Not connected to RTX830")
-        
+
         try:
             logger.info(f"Sending {len(commands)} configuration commands")
-            output = self.connection.send_config_set(commands)
+            output = self.connection.send_config_set(
+                config_commands=commands,
+                read_timeout=30
+            )
             logger.info("Configuration commands sent successfully")
             return output
             
@@ -161,7 +166,7 @@ class RTXConnection:
         Returns:
             Save command output
         """
-        return self.execute_command("save")
+        return self.connection.save_config()
 
     def get_status_info(self) -> Dict[str, str]:
         """Get various status information from RTX830.
